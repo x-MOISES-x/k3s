@@ -1,6 +1,9 @@
 output "instance_id" {
-    value = module.instance.instance_id
+  value = module.master.instance_id
 }
 output "public_ips" {
-    value = module.instance.public_ip_all_attributes
+  value = {
+    master = module.master.public_ip_all_attributes[0].ip_address
+    nodes  = [module.nodes.public_ip_all_attributes[0].ip_address, module.nodes.public_ip_all_attributes[1].ip_address, module.nodes.public_ip_all_attributes[2].ip_address]
+  }
 }
