@@ -51,30 +51,6 @@ resource "oci_network_load_balancer_backend" "k3s_node_3" {
   port                     = 443
 }
 
-
-
-//locals {
-
-
-
-//  # 1. Create a Map for the Master
-
-
-
-//  # Key = "master", Value = The OCID
-//  master_map = { "master" = module.master.instance_id[0] }
-//
-//  # 2. Create a Map for the Workers
-//  # We loop through the list and create Keys based on the index ("worker-0", "worker-1", etc.)
-//  # This separates the KEY (static string) from the VALUE (dynamic OCID)
-//  worker_map = {
-//    for idx, id in module.nodes.instance_id : "worker-${idx}" => id
-//  }
-//
-//  # 3. Merge them into one big map
-//  all_k3s_nodes_map = merge(local.master_map, local.worker_map)
-//}
-
 resource "oci_network_load_balancer_listener" "http_listener" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
   default_backend_set_name = oci_network_load_balancer_backend_set.k3s_backend_set.name

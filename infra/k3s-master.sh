@@ -20,8 +20,8 @@ systemctl disable firewalld --now || true
 ########################################
 # Wait for OCI YUM service
 ########################################
-export OPC=/home
-cat <<EOF > $OPC/k3s-server.sh
+export OPC=/home/opc
+cat <<'EOF' > $OPC/k3s-server.sh
 #!/bin/bash
 PRIVATE_IP=$(curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/vnics/ | jq -r '.[0].privateIp') 
 echo $PRIVATE_IP

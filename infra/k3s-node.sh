@@ -34,8 +34,8 @@ done
 dnf clean all
 dnf update -y
 
-OPC=/home
-cat <<EOF > $OPC/k3s-agent.sh
+OPC=/home/opc
+cat <<'EOF' > $OPC/k3s-agent.sh
 #!/bin/bash
 PRIVATE_IP=$(curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/vnics/ | jq -r '.[0].privateIp') 
 read -p "Enter the server IP: " SERVER_IP
