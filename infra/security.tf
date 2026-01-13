@@ -19,9 +19,71 @@ resource "oci_core_network_security_group_security_rule" "k3s_local_ingress" {
   source    = data.oci_core_subnet.subnet1.cidr_block
 }
 
+resource "oci_core_network_security_group_security_rule" "k3s_local_ingress_from_nlb" {
+  #Required
+  network_security_group_id = oci_core_network_security_group.k3s_local.id
+  #Optional
+  direction   = "INGRESS"
+  protocol    = "all"
+  source_type = "NETWORK_SECURITY_GROUP"
+  source      = oci_core_network_security_group.k3s_nlb.id
+}
+
 resource "oci_core_network_security_group_security_rule" "k3s_local_egress" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_local.id
+  #Optional
+  direction   = "EGRESS"
+  protocol    = "all"
+  destination = "0.0.0.0/0"
+}
+
+resource "oci_core_network_security_group" "k3s_nlb" {
+  #Required
+  compartment_id = var.compartment_ocid
+  vcn_id         = module.vcn.vcn_id
+  #Optional
+  display_name = "k3s nlb traffic"
+}
+resource "oci_core_network_security_group_security_rule" "k3s_nlb_http" {
+  #Required
+  network_security_group_id = oci_core_network_security_group.k3s_nlb.id
+  #Optional
+  direction = "INGRESS"
+  protocol  = "6" //tcp
+  source    = "0.0.0.0/0"
+  tcp_options {
+    destination_port_range {
+      min = 80
+      max = 80
+    }
+  }
+}
+resource "oci_core_network_security_group_security_rule" "k3s_nlb_https" {
+  #Required
+  network_security_group_id = oci_core_network_security_group.k3s_nlb.id
+  #Optional
+  direction = "INGRESS"
+  protocol  = "6" //tcp
+  source    = "0.0.0.0/0"
+  tcp_options {
+    destination_port_range {
+      min = 443
+      max = 443
+    }
+  }
+}
+resource "oci_core_network_security_group_security_rule" "k3s_nlb_ingress" {
+  #Required
+  network_security_group_id = oci_core_network_security_group.k3s_nlb.id
+  #Optional
+  direction = "INGRESS"
+  protocol  = "all"
+  source    = oci_core_network_security_group.k3s_local.id
+}
+resource "oci_core_network_security_group_security_rule" "k3s_nlb_egress" {
+  #Required
+  network_security_group_id = oci_core_network_security_group.k3s_nlb.id
   #Optional
   direction   = "EGRESS"
   protocol    = "all"
