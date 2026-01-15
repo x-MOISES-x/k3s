@@ -14,9 +14,11 @@ resource "oci_core_network_security_group_security_rule" "k3s_local_ingress" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_local.id
   #Optional
-  direction = "INGRESS"
-  protocol  = "all"
-  source    = data.oci_core_subnet.subnet1.cidr_block
+  direction   = "INGRESS"
+  protocol    = "all"
+  source      = data.oci_core_subnet.subnet1.cidr_block
+  source_type = "CIDR_BLOCK"
+  stateless   = false
 }
 
 resource "oci_core_network_security_group_security_rule" "k3s_local_ingress_from_nlb" {
@@ -27,7 +29,9 @@ resource "oci_core_network_security_group_security_rule" "k3s_local_ingress_from
   protocol    = "all"
   source_type = "NETWORK_SECURITY_GROUP"
   source      = oci_core_network_security_group.k3s_nlb.id
+  stateless   = false
 }
+
 
 resource "oci_core_network_security_group_security_rule" "k3s_local_egress" {
   #Required
@@ -52,6 +56,7 @@ resource "oci_core_network_security_group_security_rule" "k3s_nlb_http" {
   direction = "INGRESS"
   protocol  = "6" //tcp
   source    = "0.0.0.0/0"
+  stateless = false
   tcp_options {
     destination_port_range {
       min = 80
@@ -66,6 +71,7 @@ resource "oci_core_network_security_group_security_rule" "k3s_nlb_https" {
   direction = "INGRESS"
   protocol  = "6" //tcp
   source    = "0.0.0.0/0"
+  stateless = false
   tcp_options {
     destination_port_range {
       min = 443
@@ -77,11 +83,14 @@ resource "oci_core_network_security_group_security_rule" "k3s_nlb_ingress" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_nlb.id
   #Optional
-  direction = "INGRESS"
-  protocol  = "all"
-  source    = oci_core_network_security_group.k3s_local.id
+  direction   = "INGRESS"
+  protocol    = "all"
+  source_type = "NETWORK_SECURITY_GROUP"
+  source      = oci_core_network_security_group.k3s_local.id
+  stateless   = false
 }
-resource "oci_core_network_security_group_security_rule" "k3s_nlb_egress" {
+
+resource "oci_core_network_security_group_security_rule" "k3s_nlb_internet" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_nlb.id
   #Optional

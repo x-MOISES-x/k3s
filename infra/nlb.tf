@@ -16,39 +16,36 @@ resource "oci_network_load_balancer_backend_set" "k3s_backend_set" {
     interval_in_millis = 10000
     retries            = 3
   }
-  policy = "FIVE_TUPLE" # Uses IP+Port hashing for better distribution
+  policy             = "FIVE_TUPLE" # Uses IP+Port hashing for better distribution
+  is_preserve_source = false
 }
 
 resource "oci_network_load_balancer_backend" "k3s_master" {
   backend_set_name         = oci_network_load_balancer_backend_set.k3s_backend_set.name
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
   target_id                = module.master.instance_id[0]
-  ip_address               = module.master.instance_all_attributes[0].private_ip
-  port                     = 443
+  port                     = 80
 }
 
 resource "oci_network_load_balancer_backend" "k3s_node_1" {
   backend_set_name         = oci_network_load_balancer_backend_set.k3s_backend_set.name
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
   target_id                = module.nodes.instance_id[0]
-  ip_address               = module.nodes.instance_all_attributes[0].private_ip
-  port                     = 443
+  port                     = 80
 }
 
 resource "oci_network_load_balancer_backend" "k3s_node_2" {
   backend_set_name         = oci_network_load_balancer_backend_set.k3s_backend_set.name
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
   target_id                = module.nodes.instance_id[1]
-  ip_address               = module.nodes.instance_all_attributes[1].private_ip
-  port                     = 443
+  port                     = 80
 }
 
 resource "oci_network_load_balancer_backend" "k3s_node_3" {
   backend_set_name         = oci_network_load_balancer_backend_set.k3s_backend_set.name
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
   target_id                = module.nodes.instance_id[2]
-  ip_address               = module.nodes.instance_all_attributes[2].private_ip
-  port                     = 443
+  port                     = 80
 }
 
 resource "oci_network_load_balancer_listener" "http_listener" {
@@ -59,10 +56,10 @@ resource "oci_network_load_balancer_listener" "http_listener" {
   port                     = 80
 }
 
-resource "oci_network_load_balancer_listener" "https_listener" {
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
-  default_backend_set_name = oci_network_load_balancer_backend_set.k3s_backend_set.name
-  name                     = "k3s-https-listener"
-  protocol                 = "TCP"
-  port                     = 443
-}
+//resource "oci_network_load_balancer_listener" "https_listener" {
+//  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
+//  default_backend_set_name = oci_network_load_balancer_backend_set.k3s_backend_set.name
+//  name                     = "k3s-https-listener"
+//  protocol                 = "TCP"
+//  port                     = 443
+//}
