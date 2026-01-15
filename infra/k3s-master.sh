@@ -30,6 +30,11 @@ sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
 
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
 
+wget https://get.helm.sh/helm-v4.0.5-linux-arm64.tar.gz
+tar -zxvf helm-v4.0.5-linux-arm64.tar.gz
+mv linux-arm64/helm /usr/local/bin/helm
+rm -rf linux-arm64
+rm helm-v4.0.5-linux-arm64.tar.gz
 
 CLI_ARCH=amd64 
 if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
