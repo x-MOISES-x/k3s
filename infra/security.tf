@@ -1,7 +1,7 @@
 data "oci_core_subnet" "subnet1" {
   subnet_id = module.vcn.subnet_id["subnet1"]
 }
-
+# NSG for Instance Traffic starts here
 resource "oci_core_network_security_group" "k3s_local" {
   #Required
   compartment_id = var.compartment_ocid
@@ -9,7 +9,7 @@ resource "oci_core_network_security_group" "k3s_local" {
   #Optional
   display_name = "k3s local traffic"
 }
-
+# Allow all traffic from subnet
 resource "oci_core_network_security_group_security_rule" "k3s_local_ingress" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_local.id
@@ -20,7 +20,7 @@ resource "oci_core_network_security_group_security_rule" "k3s_local_ingress" {
   source_type = "CIDR_BLOCK"
   stateless   = false
 }
-
+# Allow all traffic from NLB NSG
 resource "oci_core_network_security_group_security_rule" "k3s_local_ingress_from_nlb" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_local.id
@@ -32,7 +32,7 @@ resource "oci_core_network_security_group_security_rule" "k3s_local_ingress_from
   stateless   = false
 }
 
-
+# Allow all traffic to internet
 resource "oci_core_network_security_group_security_rule" "k3s_local_egress" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_local.id
@@ -42,6 +42,7 @@ resource "oci_core_network_security_group_security_rule" "k3s_local_egress" {
   destination = "0.0.0.0/0"
 }
 
+# NSG for NLB Traffic starts here
 resource "oci_core_network_security_group" "k3s_nlb" {
   #Required
   compartment_id = var.compartment_ocid
@@ -49,6 +50,7 @@ resource "oci_core_network_security_group" "k3s_nlb" {
   #Optional
   display_name = "k3s nlb traffic"
 }
+# Allow HTTP traffic from internet
 resource "oci_core_network_security_group_security_rule" "k3s_nlb_http" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_nlb.id
@@ -64,6 +66,7 @@ resource "oci_core_network_security_group_security_rule" "k3s_nlb_http" {
     }
   }
 }
+# Allow HTTPS traffic from internet
 resource "oci_core_network_security_group_security_rule" "k3s_nlb_https" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_nlb.id
@@ -79,6 +82,7 @@ resource "oci_core_network_security_group_security_rule" "k3s_nlb_https" {
     }
   }
 }
+# Allow all traffic from the Instance NSG
 resource "oci_core_network_security_group_security_rule" "k3s_nlb_ingress" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_nlb.id
@@ -90,11 +94,14 @@ resource "oci_core_network_security_group_security_rule" "k3s_nlb_ingress" {
   stateless   = false
 }
 
+# Allow all traffic to internet
 resource "oci_core_network_security_group_security_rule" "k3s_nlb_internet" {
   #Required
   network_security_group_id = oci_core_network_security_group.k3s_nlb.id
   #Optional
-  direction   = "EGRESS"
-  protocol    = "all"
-  destination = "0.0.0.0/0"
+  direction        = "EGRESS"
+  protocol         = "all"
+  destination      = "0.0.0.0/0"
+  destination_type = "CIDR_BLOCK"
+  stateless        = false
 }

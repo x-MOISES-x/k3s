@@ -1,0 +1,8 @@
+${yamlencode({
+  master = {
+    hosts = { for ip in master : ip => null }
+  }
+  nodes = {
+    hosts = { for ip in nodes : ip => null }
+  }
+})}
