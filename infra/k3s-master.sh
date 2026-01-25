@@ -21,14 +21,27 @@ export OPC=/home/opc
 cat <<'EOF' > $OPC/k3s-server.sh
 #!/bin/bash
 PRIVATE_IP=$(curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/vnics/ | jq -r '.[0].privateIp') 
-
+echo $PRIVATE_IP
 K3S_TOKEN="${K3S_TOKEN:-$(openssl rand -hex 32)}"
 curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="server --flannel-backend none --disable traefik --disable-kube-proxy --disable-network-policy --node-ip $PRIVATE_IP --token $K3S_TOKEN --cluster-init --selinux --write-kubeconfig-mode 644" sh -s -
 mkdir -p $HOME/.kube 
 sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config 
 
+sudo mkdir -p /mnt/shared
+sudo chown opc:opc /mnt/shared
+echo '/mnt/shared 10.0.1.0/24(rw,sync,no_subtree_check)' | sudo tee -a /etc/exports > /dev/null
+sudo exportfs -a
+sudo systemctl restart nfs-server
+sudo systemctl enable nfs-server
 
+curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.12.1/deploy/install-driver.sh | bash -s v4.12.1 --
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
+
+wget https://get.helm.sh/helm-v4.0.5-linux-arm64.tar.gz
+tar -zxvf helm-v4.0.5-linux-arm64.tar.gz
+sudo mv linux-arm64/helm /usr/local/bin/helm
+rm -rf linux-arm64
+rm helm-v4.0.5-linux-arm64.tar.gz
 
 CLI_ARCH=amd64 
 if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
@@ -40,14 +53,17 @@ sudo tar -xzvf cilium-linux-${CLI_ARCH}.tar.gz -C /usr/local/bin
 rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
 cilium install --set ipam.operator.clusterPoolIPv4PodCIDRList="10.42.0.0/16" --set k8sServiceHost="${PRIVATE_IP}" --set k8sServicePort="6443" --set gatewayAPI.enabled="true" --set envoyConfig.enabled="true" --set loadBalancer.l7.backend="envoy" --set nodeIPAM.enabled="true" --set default-lb-service-ipam="nodeipam" 
 
+openssl req -x509 -newkey rsa:4096 -keyout this.key -out this.crt -days 365 -nodes -subj "/CN=k3s.local"
+kubectl create secret tls ssk3s --cert=this.crt --key=this.key -n cilium-secrets
 
 
 echo $PRIVATE_IP
 SERVER_TOKEN="$(sudo cat /var/lib/rancher/k3s/server/node-token)"
-echo $SERVER_TOKEN
+echo $SERVER_TOKEN \n
 EOF
 
 chmod +x $OPC/k3s-server.sh
+chown opc:opc $OPC/k3s-server.sh
 
 echo "Waiting for OCI YUM endpoint..."
 until curl -fs https://yum.us-ashburn-1.oci.oraclecloud.com >/dev/null; do

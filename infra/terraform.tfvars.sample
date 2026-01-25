@@ -1,0 +1,58 @@
+/*
+1. keep this file in the same folder as your terraform *.tf files
+2. If your terraform config is managed with Git, add the tfvars file to your .gitignore.
+3. Keep your RSA private key outside of your terraform work folder!
+----------------------------------------------------------------------------*/
+
+# provider identity parameters
+
+tenancy_ocid     = ""
+user_ocid        = ""
+fingerprint      = ""
+region           = ""
+private_key_path = ""
+
+#instance parameters
+
+ssh_authorized_keys_path = ""                                                                                 #local path to your public key
+source_ocid              = "ocid1.image.oc1.iad.aaaaaaaaqmc33b4utlnupkwtesqgp3anwrm2adfdjdfczqnkjqk7gz7bc3ja" #Oracle Linux 10
+#source_ocid              = "ocid1.image.oc1.iad.aaaaaaaaawgpyvs3zh7tu5343gpj45yqcj6hosrmrgvo5xovc7dvjwgi4vaq" #Ubuntu 24.04
+#source_ocid = "ocid1.image.oc1..aaaaaaaas7a4zwwsdtry2nsf6rqrvhgasczcyb2wxsx6x3pewxorcwr3d4pq" #RockyLinux 9
+
+# general oci parameters
+
+compartment_ocid = ""
+
+# vcn parameters
+create_internet_gateway = true
+
+create_nat_gateway = false
+
+enable_ipv6 = false
+
+nat_gateway_public_ip_id = "none"
+
+create_service_gateway = false
+
+vcn_cidrs = ["10.0.0.0/16"]
+
+vcn_dns_label = "vcn"
+
+vcn_name = "vcn"
+
+freeform_tags = {
+  environment = "k3s"
+}
+
+#defined_tags = {
+#  "Operations.CostCenter" = "42"
+#}
+
+#ID of the DRG attached to the VCN
+attached_drg_id = null
+
+#Subnets
+subnets = {
+  subnet1 = { name = "subnet1", cidr_block = "10.0.1.0/24", type = "public" }
+  #  sub2 = {cidr_block="10.0.5.0/24",type="private"}
+}

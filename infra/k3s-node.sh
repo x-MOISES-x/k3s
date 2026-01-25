@@ -31,6 +31,10 @@ PRIVATE_IP=$(curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254
 read -p "Enter the server IP: " SERVER_IP
 read -p "Enter the server token: " SERVER_TOKEN
 curl -sfL https://get.k3s.io | K3S_URL=https://$SERVER_IP:6443 K3S_TOKEN=$SERVER_TOKEN INSTALL_K3S_EXEC="agent --node-ip $PRIVATE_IP --selinux" sh -
+
+sudo mkdir -p /mnt/shared
+sudo mount -t nfs $SERVER_IP:/mnt/shared /mnt/shared
+echo '$SERVER_IP:/mnt/shared /mnt/shared nfs defaults 0 0' | sudo tee -a /etc/fstab > /dev/null
 EOF
 
 chmod +x $OPC/k3s-agent.sh
@@ -43,5 +47,6 @@ chmod +x $OPC/k3s-agent.sh
 
 dnf clean all
 dnf update -y --skip-broken --nobest --allowerasing
+
 
 

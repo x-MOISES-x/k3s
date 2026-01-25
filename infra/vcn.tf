@@ -1,16 +1,3 @@
-terraform {
-  required_providers {
-    oci = {
-      source = "oracle/oci"
-    }
-  }
-}
-
-provider "oci" {
-  config_file_profile = "DEFAULT"
-  region              = "us-ashburn-1"
-}
-
 module "vcn" {
   source  = "oracle-terraform-modules/vcn/oci"
   version = ">=3.6.0"

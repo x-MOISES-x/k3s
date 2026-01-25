@@ -1,6 +1,3 @@
-terraform {
-}
-
 locals {
   ssh_key = sensitive(file(var.ssh_authorized_keys_path))
 }
