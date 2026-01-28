@@ -20,9 +20,13 @@ To run the `k3s-agent.sh` with Ansible:
 ansible nodes -i inventory.yaml -m shell -a 'printf "TYPEK3SSERVERPRIVATEIP\nPASTETOKENSTRING\n"| /home/opc/k3s-agent.sh'
 ```
 There are two scripts which can be used to deploy kubernetes using kubeadm:
-- `k8s-install.sh` - This script will install kubeadm, kubectl, kubelet and kubeadm. It will also install containerd and configure it to use overlayfs as the storage driver. It will also install Cilium as CNI with Gateway API enabled, kube-proxy replacement and handling of LoadBalancer services.
+- `k8s-install.sh` - This script will install kubeadm, kubectl, kubelet and kubeadm. It will also install containerd and configure it to use overlayfs as the storage driver. It will also install Cilium as CNI with Gateway API enabled, kube-proxy replacement and handling of LoadBalancer services. When using a LoadBalancer service, the External IP might show as pending, delete the `node.kubernetes.io/exclude-from-external-load-balancers` label from the node for nodeIPAM to work properly.
 - `k8s-node.sh` - This script will install kubeadm, kubelet and containerd.
+
+Substitute the values in the user_data field of master and nodes modules with the flavor of your choice.
+
 A tfvars is included as an example, it must be edited to include the OCI values for your environment. The manifests folder contains a Gateway API example, an HTTPRoute to expose ArgoCD and edits to the ArgoCD ConfigMap if you choose to use ArgoCD as GitOps tool for the cluster.
 
+A 409 error might happen during `terraform destroy`, run it again to finish destroying the resources.
 
 
