@@ -67,8 +67,8 @@ resource "oci_network_load_balancer_backend" "node_http" {
 }
 
 resource "oci_network_load_balancer_listener" "http_listener" {
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
-  default_backend_set_name = oci_network_load_balancer_backend_set.k3s_http_backend_set.name
+  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb.id
+  default_backend_set_name = oci_network_load_balancer_backend_set.http_backend_set.name
   name                     = "http-listener"
   protocol                 = "TCP"
   port                     = 80
