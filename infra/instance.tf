@@ -28,7 +28,7 @@ module "master" {
   instance_state              = var.instance_state # RUNNING or STOPPED
   boot_volume_backup_policy   = "disabled"         # disabled, gold, silver or bronze
   cloud_agent_plugins         = { "autonomous_linux" : "ENABLED", "bastion" : "DISABLED", "block_volume_mgmt" : "DISABLED", "custom_logs" : "DISABLED", "java_management_service" : "DISABLED", "management" : "DISABLED", "monitoring" : "ENABLED", "osms" : "DISABLED", "run_command" : "DISABLED", "vulnerability_scanning" : "DISABLED" }
-  primary_vnic_nsg_ids        = [oci_core_network_security_group.k3s_local.id]
+  primary_vnic_nsg_ids        = [oci_core_network_security_group.local.id]
 }
 
 module "nodes" {
@@ -48,5 +48,6 @@ module "nodes" {
   instance_state              = var.instance_state # RUNNING or STOPPED
   boot_volume_backup_policy   = "disabled"         # disabled, gold, silver or bronze
   cloud_agent_plugins         = { "autonomous_linux" : "ENABLED", "bastion" : "DISABLED", "block_volume_mgmt" : "DISABLED", "custom_logs" : "DISABLED", "java_management_service" : "DISABLED", "management" : "DISABLED", "monitoring" : "ENABLED", "osms" : "DISABLED", "run_command" : "DISABLED", "vulnerability_scanning" : "DISABLED" }
-  primary_vnic_nsg_ids        = [oci_core_network_security_group.k3s_local.id]
+  primary_vnic_nsg_ids        = [oci_core_network_security_group.local.id]
 }
+

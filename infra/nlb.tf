@@ -4,7 +4,7 @@ resource "oci_network_load_balancer_network_load_balancer" "nlb" {
   subnet_id                      = data.oci_core_subnet.subnet1.id # Must be in a Public Subnet
   is_private                     = false
   is_preserve_source_destination = false
-  network_security_group_ids     = [oci_core_network_security_group.k3s_nlb.id]
+  network_security_group_ids     = [oci_core_network_security_group.nlb.id]
   lifecycle {
     prevent_destroy       = false
     create_before_destroy = true
