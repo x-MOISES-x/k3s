@@ -16,7 +16,7 @@ module "master" {
   instance_count              = 1    # how many instances do you want?
   ad_number                   = null # AD number to provision instances. If null, instances are provisionned in a rolling manner starting with AD1
   compartment_ocid            = var.compartment_ocid
-  instance_display_name       = "k3s-master"
+  instance_display_name       = "master"
   instance_flex_memory_in_gbs = 6
   instance_flex_ocpus         = 1
   source_ocid                 = data.oci_core_images.images_for_shape.images[0].id
@@ -36,7 +36,7 @@ module "nodes" {
   instance_count              = 3    # how many instances do you want?
   ad_number                   = null # AD number to provision instances. If null, instances are provisionned in a rolling manner starting with AD1
   compartment_ocid            = var.compartment_ocid
-  instance_display_name       = "k3s-node"
+  instance_display_name       = "node"
   instance_flex_memory_in_gbs = 6
   instance_flex_ocpus         = 1
   source_ocid                 = data.oci_core_images.images_for_shape.images[0].id

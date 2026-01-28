@@ -8,17 +8,20 @@ Terraform will create:
 - 4 compute instances (1 master, 3 workers) (instance.tf)
 - NSGs for the compute instances and the NLB (security.tf)
 - A local file Inventory for Ansible.
-- The k3s-server.sh script on the master is executed during terraform apply. This installs k3s, creates an NFS share and NFS CSI driver, installs Cilium, Helm and creates a self-signed certificate for the Gateway API to use for TLS termination.
+- The k3s-master.sh script on the master is executed as user-data during instance creation. This installs k3s, creates an NFS share and NFS CSI driver, installs Cilium, Helm and creates a self-signed certificate for the Gateway API to use for TLS termination.
 
-The k3s deployment options disable Traefik, ServiceLB and Kube-Proxy. Cilium is installed as CNI with Gateway API enabled, kube-proxy replacement and handling of LoadBalancer services. If you wish to edit the cluster configuration, you can do so by editing the `k3s-master.sh` and `k3s-worker.sh` scripts which run as user-data during instance creation and create two scripts `k3s-server.sh` and `k3s-agent.sh` which contain the actual k3s installation commands and reside in the `/home/opc` directory on the compute instances. Only the `k3s-server.sh` is executed during terraform apply as defined in the `deploy-k3s.tf` file, this needs Ansible to be installed on your local machine. 
+The k3s deployment options disable Traefik, ServiceLB and Kube-Proxy. Cilium is installed as CNI with Gateway API enabled, kube-proxy replacement and handling of LoadBalancer services. If you wish to edit the cluster configuration, you can do so by editing the `k3s-master.sh` and `k3s-node.sh` scripts which run as user-data during instance creation. Another script `k3s-agent.sh` is generated in the nodes with the k3s installation commands and reside in the `/home/opc` directory on the compute instances.
+
+You can: ```bash tail /var/log/cloud-init-output.log``` to check the progress of the user-data scripts, and get the K3s server private IP and Token.
 
 To run the `k3s-agent.sh` with Ansible:
 
 ```bash
 ansible nodes -i inventory.yaml -m shell -a 'printf "TYPEK3SSERVERPRIVATEIP\nPASTETOKENSTRING\n"| /home/opc/k3s-agent.sh'
 ```
-Both the K3s Server Private IP and the Token can be retrieved from the terraform apply output.
-
+There are two scripts which can be used to deploy kubernetes using kubeadm:
+- `k8s-install.sh` - This script will install kubeadm, kubectl, kubelet and kubeadm. It will also install containerd and configure it to use overlayfs as the storage driver. It will also install Cilium as CNI with Gateway API enabled, kube-proxy replacement and handling of LoadBalancer services.
+- `k8s-node.sh` - This script will install kubeadm, kubelet and containerd.
 A tfvars is included as an example, it must be edited to include the OCI values for your environment. The manifests folder contains a Gateway API example, an HTTPRoute to expose ArgoCD and edits to the ArgoCD ConfigMap if you choose to use ArgoCD as GitOps tool for the cluster.
 
 

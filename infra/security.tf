@@ -2,17 +2,17 @@ data "oci_core_subnet" "subnet1" {
   subnet_id = module.vcn.subnet_id["subnet1"]
 }
 # NSG for Instance Traffic starts here
-resource "oci_core_network_security_group" "k3s_local" {
+resource "oci_core_network_security_group" "local" {
   #Required
   compartment_id = var.compartment_ocid
   vcn_id         = module.vcn.vcn_id
   #Optional
-  display_name = "k3s local traffic"
+  display_name = "local traffic"
 }
 # Allow all traffic from subnet
-resource "oci_core_network_security_group_security_rule" "k3s_local_ingress" {
+resource "oci_core_network_security_group_security_rule" "local_ingress" {
   #Required
-  network_security_group_id = oci_core_network_security_group.k3s_local.id
+  network_security_group_id = oci_core_network_security_group.local.id
   #Optional
   direction   = "INGRESS"
   protocol    = "all"
@@ -21,21 +21,21 @@ resource "oci_core_network_security_group_security_rule" "k3s_local_ingress" {
   stateless   = false
 }
 # Allow all traffic from NLB NSG
-resource "oci_core_network_security_group_security_rule" "k3s_local_ingress_from_nlb" {
+resource "oci_core_network_security_group_security_rule" "local_ingress_from_nlb" {
   #Required
-  network_security_group_id = oci_core_network_security_group.k3s_local.id
+  network_security_group_id = oci_core_network_security_group.local.id
   #Optional
   direction   = "INGRESS"
   protocol    = "all"
   source_type = "NETWORK_SECURITY_GROUP"
-  source      = oci_core_network_security_group.k3s_nlb.id
+  source      = oci_core_network_security_group.nlb.id
   stateless   = false
 }
 
 # Allow all traffic to internet
-resource "oci_core_network_security_group_security_rule" "k3s_local_egress" {
+resource "oci_core_network_security_group_security_rule" "local_egress" {
   #Required
-  network_security_group_id = oci_core_network_security_group.k3s_local.id
+  network_security_group_id = oci_core_network_security_group.local.id
   #Optional
   direction   = "EGRESS"
   protocol    = "all"
@@ -43,17 +43,17 @@ resource "oci_core_network_security_group_security_rule" "k3s_local_egress" {
 }
 
 # NSG for NLB Traffic starts here
-resource "oci_core_network_security_group" "k3s_nlb" {
+resource "oci_core_network_security_group" "nlb" {
   #Required
   compartment_id = var.compartment_ocid
   vcn_id         = module.vcn.vcn_id
   #Optional
-  display_name = "k3s nlb traffic"
+  display_name = "nlb traffic"
 }
 # Allow HTTP traffic from internet
-resource "oci_core_network_security_group_security_rule" "k3s_nlb_http" {
+resource "oci_core_network_security_group_security_rule" "nlb_http" {
   #Required
-  network_security_group_id = oci_core_network_security_group.k3s_nlb.id
+  network_security_group_id = oci_core_network_security_group.nlb.id
   #Optional
   direction = "INGRESS"
   protocol  = "6" //tcp
@@ -67,9 +67,9 @@ resource "oci_core_network_security_group_security_rule" "k3s_nlb_http" {
   }
 }
 # Allow HTTPS traffic from internet
-resource "oci_core_network_security_group_security_rule" "k3s_nlb_https" {
+resource "oci_core_network_security_group_security_rule" "nlb_https" {
   #Required
-  network_security_group_id = oci_core_network_security_group.k3s_nlb.id
+  network_security_group_id = oci_core_network_security_group.nlb.id
   #Optional
   direction = "INGRESS"
   protocol  = "6" //tcp
@@ -83,21 +83,21 @@ resource "oci_core_network_security_group_security_rule" "k3s_nlb_https" {
   }
 }
 # Allow all traffic from the Instance NSG
-resource "oci_core_network_security_group_security_rule" "k3s_nlb_ingress" {
+resource "oci_core_network_security_group_security_rule" "nlb_ingress" {
   #Required
-  network_security_group_id = oci_core_network_security_group.k3s_nlb.id
+  network_security_group_id = oci_core_network_security_group.nlb.id
   #Optional
   direction   = "INGRESS"
   protocol    = "all"
   source_type = "NETWORK_SECURITY_GROUP"
-  source      = oci_core_network_security_group.k3s_local.id
+  source      = oci_core_network_security_group.local.id
   stateless   = false
 }
 
 # Allow all traffic to internet
-resource "oci_core_network_security_group_security_rule" "k3s_nlb_internet" {
+resource "oci_core_network_security_group_security_rule" "nlb_internet" {
   #Required
-  network_security_group_id = oci_core_network_security_group.k3s_nlb.id
+  network_security_group_id = oci_core_network_security_group.nlb.id
   #Optional
   direction        = "EGRESS"
   protocol         = "all"

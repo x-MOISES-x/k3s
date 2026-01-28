@@ -1,6 +1,6 @@
-resource "oci_network_load_balancer_network_load_balancer" "k3s_nlb" {
+resource "oci_network_load_balancer_network_load_balancer" "nlb" {
   compartment_id                 = var.compartment_ocid
-  display_name                   = "k3s-nlb"
+  display_name                   = "nlb"
   subnet_id                      = data.oci_core_subnet.subnet1.id # Must be in a Public Subnet
   is_private                     = false
   is_preserve_source_destination = false
@@ -11,9 +11,9 @@ resource "oci_network_load_balancer_network_load_balancer" "k3s_nlb" {
   }
 }
 
-resource "oci_network_load_balancer_backend_set" "k3s_http_backend_set" {
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
-  name                     = "k3s-http-backend-set"
+resource "oci_network_load_balancer_backend_set" "http_backend_set" {
+  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb.id
+  name                     = "http-backend-set"
   health_checker {
     protocol           = "TCP"
     port               = 80
@@ -24,9 +24,9 @@ resource "oci_network_load_balancer_backend_set" "k3s_http_backend_set" {
   is_preserve_source = false
 }
 
-resource "oci_network_load_balancer_backend_set" "k3s_https_backend_set" {
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
-  name                     = "k3s-https-backend-set"
+resource "oci_network_load_balancer_backend_set" "https_backend_set" {
+  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb.id
+  name                     = "https-backend-set"
   health_checker {
     protocol           = "TCP"
     port               = 443
@@ -47,21 +47,21 @@ data "oci_core_instance" "node" {
   instance_id = module.nodes.instance_id[count.index]
 }
 
-resource "oci_network_load_balancer_backend" "k3s_master_http" {
+resource "oci_network_load_balancer_backend" "master_http" {
   depends_on               = [oci_network_load_balancer_listener.http_listener]
   count                    = length(data.oci_core_instance.master)
-  backend_set_name         = oci_network_load_balancer_backend_set.k3s_http_backend_set.name
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
+  backend_set_name         = oci_network_load_balancer_backend_set.http_backend_set.name
+  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb.id
   target_id                = module.master.instance_id[count.index]
   port                     = 80
 }
 
 
-resource "oci_network_load_balancer_backend" "k3s_node_http" {
+resource "oci_network_load_balancer_backend" "node_http" {
   depends_on               = [oci_network_load_balancer_listener.http_listener]
   count                    = length(data.oci_core_instance.node)
-  backend_set_name         = oci_network_load_balancer_backend_set.k3s_http_backend_set.name
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
+  backend_set_name         = oci_network_load_balancer_backend_set.http_backend_set.name
+  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb.id
   target_id                = module.nodes.instance_id[count.index]
   port                     = 80
 }
@@ -69,37 +69,37 @@ resource "oci_network_load_balancer_backend" "k3s_node_http" {
 resource "oci_network_load_balancer_listener" "http_listener" {
   network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
   default_backend_set_name = oci_network_load_balancer_backend_set.k3s_http_backend_set.name
-  name                     = "k3s-http-listener"
+  name                     = "http-listener"
   protocol                 = "TCP"
   port                     = 80
 }
 
-resource "oci_network_load_balancer_backend" "k3s_master_https" {
+resource "oci_network_load_balancer_backend" "master_https" {
   depends_on               = [oci_network_load_balancer_listener.https_listener]
   count                    = length(data.oci_core_instance.master)
-  backend_set_name         = oci_network_load_balancer_backend_set.k3s_https_backend_set.name
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
+  backend_set_name         = oci_network_load_balancer_backend_set.https_backend_set.name
+  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb.id
   target_id                = module.master.instance_id[count.index]
   port                     = 443
 }
 
-resource "oci_network_load_balancer_backend" "k3s_node_https" {
+resource "oci_network_load_balancer_backend" "node_https" {
   depends_on               = [oci_network_load_balancer_listener.https_listener]
   count                    = length(data.oci_core_instance.node)
-  backend_set_name         = oci_network_load_balancer_backend_set.k3s_https_backend_set.name
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
+  backend_set_name         = oci_network_load_balancer_backend_set.https_backend_set.name
+  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb.id
   target_id                = module.nodes.instance_id[count.index]
   port                     = 443
 }
 
 resource "oci_network_load_balancer_listener" "https_listener" {
-  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.k3s_nlb.id
-  default_backend_set_name = oci_network_load_balancer_backend_set.k3s_https_backend_set.name
-  name                     = "k3s-https-listener"
+  network_load_balancer_id = oci_network_load_balancer_network_load_balancer.nlb.id
+  default_backend_set_name = oci_network_load_balancer_backend_set.https_backend_set.name
+  name                     = "https-listener"
   protocol                 = "TCP"
   port                     = 443
 }
 
 output "nlb_ip" {
-  value = oci_network_load_balancer_network_load_balancer.k3s_nlb.ip_addresses
+  value = oci_network_load_balancer_network_load_balancer.nlb.ip_addresses
 }

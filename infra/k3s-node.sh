@@ -47,6 +47,6 @@ chmod +x $OPC/k3s-agent.sh
 
 dnf clean all
 dnf update -y --skip-broken --nobest --allowerasing
-
+echo "$PRIVATE_IP $(hostname)" | tee -a /etc/hosts
 
 

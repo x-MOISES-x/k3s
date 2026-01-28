@@ -18,7 +18,7 @@ spec:
       tls:
         certificateRefs:
           - kind: Secret
-            name: ssk3s
+            name: selfsigned
             namespace: cilium-secrets
       allowedRoutes:
         namespaces:
