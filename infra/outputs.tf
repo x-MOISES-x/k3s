@@ -3,8 +3,8 @@ output "instance_id" {
 }
 output "public_ips" {
   value = {
-    master = module.master.public_ip_all_attributes[0].ip_address
-    nodes  = [module.nodes.public_ip_all_attributes[0].ip_address, module.nodes.public_ip_all_attributes[1].ip_address, module.nodes.public_ip_all_attributes[2].ip_address]
+    master = [for master in module.master.public_ip_all_attributes : master.ip_address]
+    nodes  = [for node in module.nodes.public_ip_all_attributes : node.ip_address]
   }
 }
 output "nlb_ip" {
