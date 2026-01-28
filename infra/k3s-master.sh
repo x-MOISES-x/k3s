@@ -29,7 +29,7 @@ sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
 
 sudo mkdir -p /mnt/shared
 sudo chown opc:opc /mnt/shared
-echo '/mnt/shared 10.0.1.0/24(rw,sync,no_subtree_check)' | sudo tee -a /etc/exports > /dev/null
+echo '/mnt/shared 10.0.1.0/24(rw,sync,no_subtree_check,no_root_squash)' | sudo tee -a /etc/exports > /dev/null
 sudo exportfs -a
 sudo systemctl restart nfs-server
 sudo systemctl enable nfs-server
