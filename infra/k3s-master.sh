@@ -45,7 +45,7 @@ chown opc:opc $OPC/.kube/config
 curl -skSL https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/v4.12.1/deploy/install-driver.sh | bash -s v4.12.1 --
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.1/standard-install.yaml
 
-export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+export KUBECONFIG=/home/opc/.kube/config
 CLI_ARCH=amd64 
 if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
 CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
