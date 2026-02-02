@@ -5,6 +5,7 @@
 ########################################
 
 swapoff -a
+sed -i.bak '/^\/.swapfile/d' /etc/fstab
 modprobe overlay
 modprobe br_netfilter
 cat <<EOF | tee /etc/sysctl.d/k8s.conf
@@ -16,8 +17,6 @@ setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 systemctl disable firewalld --now || true
 
-echo '(allow iptables_t cgroup_t (dir (ioctl)))' > /root/local_iptables.cil
-semodule -i /root/local_iptables.cil
 systemctl enable ocid.service
 systemctl start ocid.service
 

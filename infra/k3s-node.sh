@@ -5,14 +5,10 @@
 ########################################
 
 swapoff -a
-
+sed -i.bak '/^\/.swapfile/d' /etc/fstab
 systemctl enable ocid.service
 systemctl start ocid.service
-
 systemctl disable firewalld --now || true
-
-echo '(allow iptables_t cgroup_t (dir (ioctl)))' > /root/local_iptables.cil
-semodule -i /root/local_iptables.cil
 
 ########################################
 # Wait for OCI YUM service
