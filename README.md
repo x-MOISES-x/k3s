@@ -1,6 +1,8 @@
 This is a personal project to deploy a kubernetes cluster using k3s on Oracle Cloud Infrastructure (OCI) Always Free tier in a mostly automated way. It is meant to be used as a template to quickly deploy a k3s cluster on OCI and test applications.
 
-Before using this, you must have already setup your OCI environment as explained here: https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm in order to use terraform. The structure is kept flat to make things simpler.
+Before using this, you must have already setup your OCI environment in order to use terraform as explained here ==> https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm 
+
+The structure is kept flat to make things simpler.
 
 For the compute instances and networking the OCI Terraform modules were used.
 
