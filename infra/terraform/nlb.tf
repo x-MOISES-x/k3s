@@ -100,6 +100,3 @@ resource "oci_network_load_balancer_listener" "https_listener" {
   port                     = 443
 }
 
-output "nlb_ip" {
-  value = oci_network_load_balancer_network_load_balancer.nlb.ip_addresses
-}

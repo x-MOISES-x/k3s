@@ -23,7 +23,7 @@ module "master" {
   subnet_ocids                = [module.vcn.subnet_id["subnet1"]]
   public_ip                   = "EPHEMERAL" # NONE, RESERVED or EPHEMERAL
   ssh_public_keys             = local.ssh_key
-  user_data                   = base64encode(file("k3s-master.sh"))
+  user_data                   = base64encode(file("${path.module}/scripts/k3s-master.sh"))
   shape                       = var.shape
   instance_state              = var.instance_state # RUNNING or STOPPED
   boot_volume_backup_policy   = "disabled"         # disabled, gold, silver or bronze
@@ -43,7 +43,7 @@ module "nodes" {
   subnet_ocids                = [module.vcn.subnet_id["subnet1"]]
   public_ip                   = "EPHEMERAL" # NONE, RESERVED or EPHEMERAL
   ssh_public_keys             = local.ssh_key
-  user_data                   = base64encode(file("k3s-node.sh"))
+  user_data                   = base64encode(file("${path.module}/scripts/k3s-node.sh"))
   shape                       = var.shape
   instance_state              = var.instance_state # RUNNING or STOPPED
   boot_volume_backup_policy   = "disabled"         # disabled, gold, silver or bronze

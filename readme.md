@@ -1,4 +1,7 @@
-This is a personal project to deploy a kubernetes cluster using k3s on Oracle Cloud Infrastructure (OCI) Always Free tier in a mostly automated way.
+This is a personal project to deploy a kubernetes cluster using k3s on Oracle Cloud Infrastructure (OCI) Always Free tier in a mostly automated way. It is meant to be used as a template to quickly deploy a k3s cluster on OCI and test applications.
+
+Before using this, you must have already setup your OCI environment as explained here: https://docs.oracle.com/en-us/iaas/Content/API/Concepts/apisigningkey.htm in order to use terraform. The structure is kept flat to make things simpler.
+
 For the compute instances and networking the OCI Terraform modules were used.
 
 Terraform will create:
@@ -8,9 +11,11 @@ Terraform will create:
 - 4 compute instances (1 master, 3 workers) (instance.tf)
 - NSGs for the compute instances and the NLB (security.tf)
 - A local file Inventory for Ansible.
-- The k3s-master.sh script on the master is executed as user-data during instance creation. This installs k3s, creates an NFS share and NFS CSI driver, installs Cilium, Helm and creates a self-signed certificate for the Gateway API to use for TLS termination.
+- The k3s-server.sh script on the master is executed during terraform apply. This installs k3s, creates an NFS share and NFS CSI driver, installs Cilium, Helm and creates a self-signed certificate for the Gateway API to use for TLS termination.
 
-The k3s deployment options disable Traefik, ServiceLB and Kube-Proxy. Cilium is installed as CNI with Gateway API enabled, kube-proxy replacement and handling of LoadBalancer services. If you wish to edit the cluster configuration, you can do so by editing the `k3s-master.sh` and `k3s-node.sh` scripts which run as user-data during instance creation. Another script `k3s-agent.sh` is generated in the nodes with the k3s installation commands and reside in the `/home/opc` directory on the compute instances.
+The k3s deployment options are not the default ones. Traefik, ServiceLB and Kube-Proxy are disabled. Instead, Cilium is used as CNI with Gateway API enabled, kube-proxy replacement and handling of LoadBalancer services. If you wish to edit the cluster configuration, you can do so by editing the `k3s-master.sh` and `k3s-worker.sh` scripts which run as user-data during instance creation and create two scripts `k3s-server.sh` and `k3s-agent.sh` which contain the actual k3s installation commands and reside in the `/home/opc` directory on the compute instances. Only the `k3s-server.sh` is executed during terraform apply as defined in the `deploy-k3s.tf` file, this needs Ansible to be installed on your local machine. 
+
+A tfvars is included as an example, it must be edited to include the OCI values for your environment. The manifests folder contains a Gateway API example, an HTTPRoute to expose ArgoCD and edits to the ArgoCD ConfigMap if you choose to use ArgoCD as GitOps tool for the cluster.
 
 You can: ```bash tail /var/log/cloud-init-output.log``` to check the progress of the user-data scripts, and get the K3s server private IP and Token.
 
